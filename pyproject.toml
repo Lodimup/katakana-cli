@@ -1,7 +1,7 @@
 [project]
 name = "katakana-cli"
 version = "0.1.0"
-description = "Someday I'll read it like a pro, but not today."
+description = "Someday I'll read it like a pro, but probably not today."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
