@@ -58,8 +58,6 @@ def main():
 
         word_hist.save()
 
-        num_challenge -= 1
-
     print("Training session completed!")
     print("Review your answers:")
     correct_count = training_session.wordhist_set.filter(is_correct=True).count()
