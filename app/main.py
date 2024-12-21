@@ -55,6 +55,11 @@ def main():
         else:
             sys.stdout.write("\033[F\033[K")
             print(f"{word}: {correct_word} [red]Incorrect![/red]")
+            while True:
+                user_input = input(f"{word}: ")
+                if user_input == correct_word:
+                    print(f"{word}: {correct_word} [green]OK![/green]")
+                    break
 
         word_hist.save()
 
