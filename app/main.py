@@ -11,20 +11,38 @@ django.setup()
 
 from db.models import TrainingSession, User, WordHist  # noqa: E402
 
+CORPUS_NAME = "katakana"
+CORPUS = KATAKANA
+
 
 def main():
     num_challenge = 20
+    selected_incorrect_words = []
     user_input = input("username: ")
     user, _ = User.objects.get_or_create(username=user_input)
-    training_session = TrainingSession.objects.create(corpus="katakana", user=user)
-
-    while num_challenge > 0:
-        is_correct = False
-        word = random.choice(list(KATAKANA.keys()))
-        word_hist = WordHist.objects.create(
-            word=word, corpus="katakana", training_session=training_session
+    prev_training_session = (
+        TrainingSession.objects.filter(user=user).order_by("-created").first()
+    )
+    words = random.sample(list(CORPUS.keys()), num_challenge)
+    if prev_training_session:
+        incorrect_words = prev_training_session.wordhist_set.filter(
+            is_correct=False
+        ).values_list("word", flat=True)
+        selected_incorrect_words = random.sample(
+            list(incorrect_words), min(5, len(incorrect_words))
         )
-        correct_word = KATAKANA[word]
+        words += selected_incorrect_words
+        random.shuffle(words)
+
+    # start training session
+    training_session = TrainingSession.objects.create(corpus=CORPUS_NAME, user=user)
+    print(f"previous incorrect words: {", ".join(selected_incorrect_words)}")
+    for word in words:
+        is_correct = False
+        word_hist = WordHist.objects.create(
+            word=word, corpus=CORPUS_NAME, training_session=training_session
+        )
+        correct_word = CORPUS[word]
         user_input = input(f"{word}: ")
 
         if user_input == correct_word:
@@ -47,7 +65,7 @@ def main():
     correct_count = training_session.wordhist_set.filter(is_correct=True).count()
     incorrect_count = training_session.wordhist_set.filter(is_correct=False).count()
     for word_hist in training_session.wordhist_set.all():
-        correct_word = KATAKANA.get(word_hist.word)
+        correct_word = CORPUS.get(word_hist.word)
         hist_result_text = (
             "[green]Correct![/green]"
             if word_hist.is_correct
