@@ -1,7 +1,7 @@
 run:
 	uv sync
 	cd app && python manage.py migrate \
-	&& python main.py
+	&& uv run main.py
 
 mm:
 	cd app && python manage.py makemigrations
